@@ -3,6 +3,10 @@ package com.nizam.geo.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -13,24 +17,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.BindingResult;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nizam.geo.dto.PostcodeDTO;
 import com.nizam.geo.entity.PostcodeEntity;
 import com.nizam.geo.service.PostcodeService;
 
 public class PostcodeControllerTest {
-
-	@Autowired
-    private MockMvc mockMvc;
     
 	@Mock
     private PostcodeService postcodeService;
@@ -41,7 +36,6 @@ public class PostcodeControllerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-    	this.mockMvc = MockMvcBuilders.standaloneSetup(new PostcodeController()).build();
     }
 
     @Test
@@ -94,27 +88,41 @@ public class PostcodeControllerTest {
     }
     
     @Test
-    public void testUpdatePostcode_Success() throws Exception {
-        // Mock postcodeDTO for successful update
-        PostcodeDTO postcodeDTO = new PostcodeDTO();
-        postcodeDTO.setLatitude(51.5074);
-        postcodeDTO.setLongitude(0.1278);
+    public void testUpdatePostcode_Success() {
+        // Mock data
+        String postcode = "ABC123";
+        PostcodeDTO mockPostcodeDTO = new PostcodeDTO();
+        mockPostcodeDTO.setLatitude(51.5074);
+        mockPostcodeDTO.setLongitude(-0.1278);
 
-        // Mock service method behavior
+        // Mock successful update in service layer
         when(postcodeService.updatePostcodeCoordinates(anyString(), anyDouble(), anyDouble())).thenReturn(true);
 
-        // Perform the mock MVC request
-        mockMvc.perform(MockMvcRequestBuilders.put("/postcodes/12345")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(postcodeDTO)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Post code coordinates updated successfully"));
+        // Call the controller method
+        ResponseEntity<String> responseEntity = postcodeController.updatePostcode(postcode, mockPostcodeDTO, mock(BindingResult.class));
+
+        // Verify the behavior
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("Post code coordinates updated successfully", responseEntity.getBody());
+
+        // Verify that the service method was called with the correct arguments
+        verify(postcodeService, times(1)).updatePostcodeCoordinates(eq(postcode), eq(mockPostcodeDTO.getLatitude()), eq(mockPostcodeDTO.getLongitude()));
     }
 
-    // Utility method to convert object to JSON string
-    private String asJsonString(Object obj) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(obj);
+    @Test
+    public void testUpdatePostcode_InvalidRequest() {
+        // Mock data for invalid request scenario
+        String postcode = "InvalidPostcode";
+        PostcodeDTO mockPostcodeDTO = new PostcodeDTO();
+        mockPostcodeDTO.setPostcode(null); // invalid RequestBody
+        mockPostcodeDTO.setLatitude(1000.0);
+        mockPostcodeDTO.setLongitude(-2000.0);
+
+        // Call the controller method with invalid request data
+        ResponseEntity<String> responseEntity = postcodeController.updatePostcode(postcode, mockPostcodeDTO, mock(BindingResult.class));
+
+        // Verify the behavior
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 
 }

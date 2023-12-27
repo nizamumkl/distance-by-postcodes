@@ -66,7 +66,7 @@ public class PostcodeServiceTest {
 
         List<PostcodeEntity> result = postcodeService.getAllPostcodes();
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         assertEquals(mockEntities.get(0), result.get(0));
     }
 

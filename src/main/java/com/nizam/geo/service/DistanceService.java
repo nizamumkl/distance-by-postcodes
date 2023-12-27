@@ -1,5 +1,6 @@
 package com.nizam.geo.service;
 
+import org.apache.commons.math3.util.Precision;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +26,6 @@ public class DistanceService {
 					+ Math.cos(lat1Radians) * Math.cos(lat2Radians) * haversine(lon1Radians, lon2Radians);
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-		return (EARTH_RADIUS * c);
+		return Precision.round(EARTH_RADIUS * c, 1);
     }
 }

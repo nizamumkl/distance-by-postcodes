@@ -1,5 +1,8 @@
 package com.nizam.geo.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -9,12 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.nizam.geo.entity.PostcodeEntity;
-import com.nizam.geo.response.DistanceResponse;
 import com.nizam.geo.service.DistanceService;
 import com.nizam.geo.service.PostcodeService;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class DistanceControllerTest {
 
@@ -57,7 +56,7 @@ public class DistanceControllerTest {
                 location2.getLatitude(), location2.getLongitude())).thenReturn(distanceResult);
 
         // Call the controller method
-        ResponseEntity<DistanceResponse> responseEntity = distanceController.getDistance(postcode1, postcode2);
+        ResponseEntity<?> responseEntity = distanceController.getDistance(postcode1, postcode2);
 
         // Verify the response
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -73,7 +72,7 @@ public class DistanceControllerTest {
         when(postcodeService.findByPostcode(postcode2)).thenReturn(null);
 
         // Call the controller method
-        ResponseEntity<DistanceResponse> responseEntity = distanceController.getDistance(postcode1, postcode2);
+        ResponseEntity<?> responseEntity = distanceController.getDistance(postcode1, postcode2);
 
         // Verify the response
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());

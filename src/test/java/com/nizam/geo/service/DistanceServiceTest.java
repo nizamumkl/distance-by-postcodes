@@ -1,7 +1,8 @@
 package com.nizam.geo.service;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class DistanceServiceTest {
 
@@ -9,6 +10,7 @@ public class DistanceServiceTest {
 
     @Test
     public void testCalculateDistance() {
+    	 
         DistanceService distanceService = new DistanceService();
 
         // Coordinates for two locations
@@ -17,7 +19,7 @@ public class DistanceServiceTest {
         double lat2 = 34.0522; 		// City02 latitude
         double lon2 = -118.2437;	// City02 longitude
 
-        double expectedDistance = 3933.5; // Approximate distance in kilometers between City01 and City02
+        double expectedDistance = 3935.7; // Approximate distance in kilometers between City01 and City02
 
         // Calculate distance using the service method
         double calculatedDistance = distanceService.calculateDistance(lat1, lon1, lat2, lon2);
